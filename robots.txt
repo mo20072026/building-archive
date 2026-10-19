@@ -1,0 +1,27 @@
+User-agent: *
+Disallow: /
+
+# 兜底：即使有外层配置遗漏，这里也禁止任何爬虫抓取整站
+User-agent: Googlebot
+Disallow: /
+
+User-agent: Bingbot
+Disallow: /
+
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: YandexBot
+Disallow: /
+
+User-agent: DuckDuckBot
+Disallow: /
+
+User-agent: Sogou web spider
+Disallow: /
+
+User-agent: Exabot
+Disallow: /
+
+User-agent: archive.org_bot
+Disallow: /

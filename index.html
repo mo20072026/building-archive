@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta http-equiv="X-Robots-Tag" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="bingbot" content="noindex, nofollow">
+<meta name="baiduspider" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="google-site-verification" content="noindex">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="copyright" content="Internal Use Only">
+<meta name="author" content="Private">
+<meta name="description" content="">
+<meta name="keywords" content="">
+<title>资料查询</title>
+<link rel="canonical" href="./">
+<script type="application/ld+json">{}</script>
+<style>
+  :root{
+    --head:#2F5597; --head2:#4472C4; --line:#D9D9D9; --bg:#F5F6F8;
+    --txt:#1F2937; --sub:#6B7280;
+    --owner:#D9E2F3; --web:#FDE9E9; --doubt:#F8CBAD; --diff:#C00000;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+    font:14px/1.6 "Microsoft YaHei","PingFang SC",sans-serif}
+  header{background:linear-gradient(135deg,var(--head),var(--head2));
+    color:#fff;padding:18px 24px}
+  header h1{margin:0;font-size:19px;font-weight:700}
+  header p{margin:4px 0 0;font-size:12px;opacity:.85}
+
+  .bar{background:#fff;border-bottom:1px solid var(--line);padding:14px 24px;
+    display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;
+    position:sticky;top:0;z-index:20}
+  .field{display:flex;flex-direction:column;gap:5px}
+  .field label{font-size:12px;color:var(--sub);font-weight:600}
+  select,input{font:inherit;padding:8px 10px;border:1px solid #C6CBD4;
+    border-radius:6px;background:#fff;min-width:170px;color:var(--txt)}
+  select:focus,input:focus{outline:2px solid var(--head2);outline-offset:-1px}
+  select:disabled{background:#F0F1F3;color:#9AA1AC;cursor:not-allowed}
+  #search{min-width:190px}
+
+  main{padding:18px 24px 48px;max-width:1560px;margin:0 auto}
+  .card{background:#fff;border:1px solid var(--line);border-radius:10px;
+    margin-bottom:16px;overflow:hidden}
+  .card>h2{margin:0;padding:12px 16px;font-size:15px;background:#EEF2F9;
+    border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+  .card>h2 .cnt{font-size:12px;color:var(--sub);font-weight:400}
+  .hint{padding:8px 16px;font-size:12px;color:var(--sub);
+    background:#FAFAFB;border-bottom:1px solid #EFEFF1}
+  .pad{padding:14px 16px}
+
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:var(--head);color:#fff;text-align:left;padding:9px 10px;
+    font-weight:600;position:sticky;top:0;font-size:12px}
+  td{padding:8px 10px;border-bottom:1px solid #EDEDF0;vertical-align:top}
+  tr:nth-child(even) td{background:#FAFBFC}
+  tr:hover td{background:#EAF1FB}
+  .tw{max-height:none;overflow-x:auto}
+
+  .kv{display:grid;grid-template-columns:minmax(140px,210px) 1fr;
+    border-top:1px solid #EDEDF0}
+  .kv>div{padding:8px 12px;border-bottom:1px solid #EDEDF0;font-size:13px}
+  .kv .k{font-weight:600;background:#F7F9FC;border-right:1px solid #EDEDF0}
+  .kv .v{word-break:break-word}
+
+  .grp{margin-bottom:6px}
+  .grp>h3{margin:0;font-size:13px;padding:9px 16px;background:#F2F5FA;
+    border:1px solid #E2E8F2;border-bottom:none;color:var(--head);
+    display:flex;justify-content:space-between}
+  .grp>h3 span{font-weight:400;font-size:12px;color:var(--sub)}
+  .grp .tw{border:1px solid #E2E8F2;border-top:none}
+
+  .tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:11px;
+    margin:2px 4px 0 0;white-space:nowrap;border:1px solid rgba(0,0,0,.08)}
+  .t-owner{background:var(--owner);color:#1E3A6E}
+  .t-web{background:var(--web);color:#8C2020}
+  .t-doubt{background:var(--doubt);color:#7A3B00}
+  .t-diff{background:var(--diff);color:#fff;font-weight:700}
+
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--sub)}
+  .empty{text-align:center;padding:60px 20px;color:var(--sub)}
+  .empty b{display:block;font-size:15px;color:var(--txt);margin-bottom:6px}
+  mark{background:#FFF3A3;padding:0 2px;border-radius:2px}
+
+  /* 装修手册弹层 */
+  #gate{position:fixed;inset:0;z-index:999;background:var(--bg);
+    display:flex;align-items:center;justify-content:center;padding:20px}
+  .gcard{background:#fff;border:1px solid var(--line);border-radius:12px;
+    padding:28px 24px;width:100%;max-width:340px;text-align:center}
+  .gtitle{font-size:18px;font-weight:700;color:var(--head);margin-bottom:6px}
+  .gsub{font-size:12px;color:var(--sub);margin-bottom:18px}
+  #gpwd{width:100%;padding:10px 12px;border:1px solid #C6CBD4;border-radius:8px;
+    font:inherit;text-align:center;letter-spacing:2px}
+  #gbtn{width:100%;margin-top:12px;padding:10px 12px;border:0;border-radius:8px;
+    background:var(--head);color:#fff;font:inherit;font-weight:600;cursor:pointer}
+  #gbtn:active{background:var(--head2)}
+  .gmsg{min-height:20px;margin-top:10px;font-size:12px;color:var(--sub)}
+  .gmsg.bad{color:#C00000}
+
+  .mbox{position:fixed;inset:0;background:rgba(15,20,30,.55);z-index:60;
+    display:flex;align-items:center;justify-content:center;padding:16px}
+  .mbox[hidden]{display:none}
+  .mbox-in{background:#fff;border-radius:12px;width:min(1200px,100%);
+    height:min(88vh,900px);display:flex;flex-direction:column;overflow:hidden;
+    box-shadow:0 18px 48px rgba(0,0,0,.3)}
+  .mbox-head{display:flex;justify-content:space-between;align-items:center;
+    padding:12px 16px;background:#EEF2F9;border-bottom:1px solid var(--line);
+    font-size:14px}
+  .mbox-x{cursor:pointer;color:var(--sub);font-size:13px;padding:4px 8px;
+    border-radius:5px}
+  .mbox-x:hover{background:#E1E7F2;color:var(--txt)}
+  .mbox-body{flex:1;display:flex;min-height:0}
+  .mbox-side{width:290px;flex:0 0 290px;border-right:1px solid var(--line);
+    overflow:auto;padding:10px}
+  .mbox-view{flex:1;overflow:auto;background:#525659}
+  .mbox-view iframe{width:100%;height:100%;border:0;display:block}
+  .mitem{border:1px solid #E3E6EC;border-radius:8px;padding:9px 11px;
+    margin-bottom:8px;cursor:pointer;background:#fff}
+  .mitem:hover{border-color:var(--head2);background:#F5F8FD}
+  .mitem.on{border-color:var(--head);background:#EAF1FB}
+  .mitem .mv{font-weight:700;font-size:13px;color:var(--head)}
+  .mitem .mn{font-size:11.5px;color:var(--sub);word-break:break-all;
+    margin-top:3px;line-height:1.45}
+  .mitem .mm{font-size:11px;color:var(--sub);margin-top:5px}
+  .bad{background:#FFF6F6;border:1px solid #F3C9C9;color:#9B2226;
+    padding:10px;border-radius:8px;font-size:12.5px;margin-bottom:8px}
+  .mlib{display:inline-block;margin-top:6px;font-size:11.5px;color:var(--head2)}
+
+  /* 手机端：表格列太多，改为纵向卡片式，每行一条，横向不再滚动 */
+  .card{overflow:visible}
+  @media(max-width:760px){
+    .bar{position:static;flex-direction:column;align-items:stretch;padding:12px 16px}
+    select,input{min-width:0;width:100%}
+    main{padding:12px 12px 40px}
+    .card{border-radius:8px}
+    .card>h2{font-size:14px;padding:10px 12px;flex-wrap:wrap;gap:4px}
+    .hint,.pad{padding:8px 12px}
+    .kv{grid-template-columns:1fr}
+    .kv .k{background:#EDF1F8;border-right:none;
+      border-bottom:1px dashed #DDD;padding-bottom:4px}
+    .tw{overflow-x:visible}
+    .grp{margin-bottom:10px}
+    .grp>h3{padding:8px 12px;font-size:12.5px}
+
+    /* 表头转卡片标签 */
+    table,tbody,tr,td{display:block;width:100%}
+    thead{display:none}
+    tbody tr{border:1px solid #E3E6EC;border-radius:8px;margin:8px;
+      background:#fff;overflow:hidden}
+    tbody tr:nth-child(even) td{background:#fff}
+    tbody tr:hover td{background:#fff}
+    td{border:0;border-bottom:1px dashed #EEE;padding:5px 10px;
+      display:flex;gap:10px;align-items:baseline}
+    td:last-child{border-bottom:0}
+    td::before{content:attr(data-h);flex:0 0 82px;color:var(--sub);
+      font-size:11.5px;font-weight:600;line-height:1.5}
+    td:empty{display:none}
+
+    /* 手册弹层改上下布局：版本列表在上、预览在下 */
+    .mbox{padding:0}
+    .mbox-in{height:100vh;width:100%;border-radius:0}
+    .mbox-body{flex-direction:column}
+    .mbox-side{width:auto;flex:0 0 auto;max-height:38vh;border-right:none;
+      border-bottom:1px solid var(--line)}
+    #mbtn{width:100%}
+  }
+</style>
+</head>
+<body>
+<div id="gate">
+  <div class="gcard">
+    <div class="gtitle">资料查询</div>
+    <div class="gsub">本系统为内部资料，仅限授权人员使用</div>
+    <input id="gpwd" type="password" placeholder="请输入访问口令" autocomplete="current-password">
+    <button id="gbtn">进入</button>
+    <div class="gmsg" id="gmsg"></div>
+  </div>
+</div>
+<div id="app" style="display:none">
+<header>
+  <h1>楼宇档案查询</h1>
+  <p>以整栋楼宇为主体的档案台账 · 供投标摸底、装修设计、造价编制与客户介绍使用</p>
+</header>
+
+<div class="bar">
+  <div class="field"><label for="city">① 城市</label>
+    <select id="city"><option value="">请选择城市</option></select></div>
+  <div class="field"><label for="bld">② 楼宇名称</label>
+    <select id="bld" disabled><option value="">请先选择城市</option></select></div>
+  <div class="field"><label for="cat">③ 信息类别</label>
+    <select id="cat" disabled><option value="">请先选择楼宇</option></select></div>
+  <div class="field"><label for="search">表内搜索</label>
+    <input id="search" placeholder="关键词…" disabled></div>
+  <div class="field"><label>&nbsp;</label>
+    <button id="mbtn" style="font:inherit;padding:8px 14px;border:1px solid #C6CBD4;
+      border-radius:6px;background:#fff;cursor:pointer">📖 装修手册</button></div>
+</div>
+
+<main id="main"></main>
+
+<!-- 装修手册预览：内嵌 PDF + 版本列表 -->
+<div id="mbox" class="mbox" hidden>
+  <div class="mbox-in">
+    <div class="mbox-head">
+      <b id="mtitle">物业装修手册</b>
+      <span class="mbox-x" id="mclose">✕ 关闭</span>
+    </div>
+    <div class="mbox-body">
+      <div class="mbox-side">
+        <div id="mlist"></div>
+      </div>
+      <div class="mbox-view" id="mview"></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+/* 访问口令：源码里不存口令、也不存口令摘要。
+   页面所有资料（楼宇数据 + 装修手册原件）都是 AES-GCM 密文，
+   口令经 PBKDF2-SHA256 派生出密钥；口令不对，密文根本解不开。 */
+const GATE_KEY = "lkp";
+let KEY = null, BUNDLE = null;
+const b64dec = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+
+async function deriveKey(pwd, saltB64, iter){
+  const base = await crypto.subtle.importKey("raw",
+    new TextEncoder().encode(pwd), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey(
+    {name:"PBKDF2", salt:b64dec(saltB64), iterations:iter, hash:"SHA-256"},
+    base, {name:"AES-GCM", length:256}, false, ["decrypt"]);
+}
+async function unlock(pwd){
+  const r = await fetch("data.enc.json", {cache:"no-store"});
+  if(!r.ok) throw new Error("HTTP " + r.status);
+  const meta = await r.json();
+  const key = await deriveKey(pwd, meta.salt, meta.iter);
+  const pt = await crypto.subtle.decrypt(
+    {name:"AES-GCM", iv:b64dec(meta.iv)}, key, b64dec(meta.ct));
+  return {key, bundle: JSON.parse(new TextDecoder().decode(pt))};
+}
+function gatePaint(ok){
+  const g=$("gate"), a=$("app");
+  g.style.display = ok ? "none" : "flex";
+  a.style.display = ok ? "block" : "none";
+}
+async function gateTry(){
+  const p = $("gpwd").value.trim();
+  const m = $("gmsg");
+  if(!p){ m.textContent = "请输入口令"; m.className="gmsg bad"; return; }
+  m.textContent = "校验中…"; m.className="gmsg";
+  try{
+    const {key, bundle} = await unlock(p);
+    KEY = key; BUNDLE = bundle;
+    try{ sessionStorage.setItem(GATE_KEY, p); }catch(e){}
+    gatePaint(true); boot();
+  }catch(e){
+    if(e && e.name === "OperationError"){
+      m.textContent = "口令不正确"; m.className="gmsg bad";
+      $("gpwd").value = "";
+    }else if(e && /HTTP|Failed to fetch|NetworkError/i.test(e.message||"")){
+      m.textContent = "数据读取失败，请检查网络后重试"; m.className="gmsg bad";
+    }else{
+      m.textContent = "当前环境不支持解密，请用 https 打开"; m.className="gmsg bad";
+    }
+  }
+}
+document.addEventListener("DOMContentLoaded", async ()=>{
+  $("gbtn").addEventListener("click", gateTry);
+  $("gpwd").addEventListener("keydown", e=>{ if(e.key==="Enter") gateTry(); });
+  let p = null;
+  try{ p = sessionStorage.getItem(GATE_KEY); }catch(e){}
+  if(p){
+    try{
+      const {key, bundle} = await unlock(p);
+      KEY = key; BUNDLE = bundle; gatePaint(true); boot(); return;
+    }catch(e){ try{ sessionStorage.removeItem(GATE_KEY); }catch(_){} }
+  }
+  gatePaint(false);
+});
+let BOOTED = false;
+function boot(){
+  if(BOOTED) return; BOOTED = true;
+  loadData();
+}
+</script>
+
+<script>
+const SRC_LABEL = {owner:"业主资料", web:"非官网来源，待核实",
+                    doubt:"数据分歧/未载明", diff:"项目间不一致", none:""};
+
+let DATA = {buildings:[]}, BLD = null, CAT = null;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?"":s).replace(/[&<>"]/g,
+  c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* 三个下拉：城市 -> 楼宇 -> 信息类别 */
+function fillCities(){
+  const cities = [...new Set(DATA.buildings.map(b=>b.city).filter(Boolean))].sort();
+  $("city").innerHTML = '<option value="">请选择城市</option>' +
+    cities.map(c=>`<option>${esc(c)}</option>`).join("");
+}
+function fillBuildings(){
+  const c = $("city").value, bs = DATA.buildings.filter(b=>b.city===c);
+  $("bld").disabled = !c;
+  $("bld").innerHTML = c
+    ? '<option value="">请选择楼宇</option>' +
+      bs.map(b=>`<option value="${esc(b.id)}">${esc(b.name)}</option>`).join("")
+    : '<option value="">请先选择城市</option>';
+  $("cat").disabled = true;
+  $("search").disabled = true;
+}
+function fillCats(){
+  BLD = DATA.buildings.find(b=>b.id===$("bld").value) || null;
+  $("cat").disabled = !BLD;
+  $("cat").innerHTML = BLD
+    ? '<option value="">请选择信息类别</option>' +
+      BLD.cats.map(c=>`<option value="${esc(c.key)}">${esc(c.label)}</option>`).join("")
+    : '<option value="">请先选择楼宇</option>';
+  $("search").disabled = !BLD;
+  $("search").value = "";
+  render();
+}
+function render(){ CAT = BLD ? BLD.cats.find(c=>c.key===$("cat").value) || null : null;
+  $("search").disabled = !CAT; draw(); }
+
+function tagHTML(src){
+  return (src||[]).filter(s=>s!=="none").map(s=>
+    `<span class="tag t-${s}">${esc(SRC_LABEL[s]||s)}</span>`).join("");
+}
+/* 单元格着色：与 Excel 底色一致，来源徽章叠在右下 */
+function cellStyle(src){
+  const has = (src||[]).some(s=>s!=="none");
+  if (!has) return "";
+  if ((src||[]).includes("diff")) return ' style="background:var(--diff);color:#fff;font-weight:700"';
+  const map = {owner:"var(--owner)", web:"var(--web)", doubt:"var(--doubt)"};
+  const c = map[(src||[]).find(s=>s!=="none")];
+  return c ? ` style="background:${c}"` : "";
+}
+function hl(text, kw){
+  const t = String(text==null?"":text);
+  if (!kw) return esc(t) || '<span style="color:#B0B6BE">—</span>';
+  return esc(t).replace(new RegExp("("+kw.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","gi"),
+    "<mark>$1</mark>");
+}
+function hit(cells, kw){
+  if (!kw) return true;
+  const k = kw.toLowerCase();
+  return cells.some(c => String(c).toLowerCase().includes(k));
+}
+
+function kvHTML(items, kw){
+  const rows = items.filter(it => hit([it.k, it.v], kw));
+  if (!rows.length) return '<div class="empty">没有匹配的内容</div>';
+  return '<div class="pad">' + rows.map(it =>
+    `<div class="kv" style="${cellStyle(it.src)}">
+       <div class="k">${hl(it.k,kw)}${tagHTML(it.src)}</div>
+       <div class="v">${hl(it.v,kw)}</div></div>`).join("") + '</div>';
+}
+function tblHTML(headers, rows, kw){
+  const rs = rows.filter(r => hit(r.cells, kw));
+  if (!rs.length) return '<div class="empty">没有匹配的内容</div>';
+  return '<div class="tw"><table><thead><tr>' +
+    headers.map(h=>`<th>${esc(h)}</th>`).join("") + '</tr></thead><tbody>' +
+    rs.map(r=>'<tr>' + r.cells.map((c,i)=>
+      // data-h 供窄屏卡片式布局显示列名
+      `<td data-h="${esc(headers[i]||"")}"${cellStyle(r.src)}>${hl(c,kw)}</td>`).join("") +
+      '</tr>').join("") + '</tbody></table></div>';
+}
+function grpHTML(cat, kw){
+  const out = [];
+  cat.groups.forEach(g=>{
+    const rs = g.rows.filter(r=>hit(r.cells,kw));
+    if (!rs.length) return;
+    out.push(`<div class="grp"><h3>${esc(g.name)}<span>${rs.length} 条</span></h3>` +
+      tblHTML(cat.headers.slice(1), rs, kw) + '</div>');
+  });
+  return out.length ? out.join('') : '<div class="empty">没有匹配的内容</div>';
+}
+
+function draw(){
+  const m = $("main");
+  if (!BLD) return m.innerHTML = '<div class="empty"><b>请先选择城市与楼宇</b>' +
+    '共 '+DATA.buildings.length+' 栋楼宇、'+new Set(DATA.buildings.map(b=>b.city)).size+' 个城市</div>';
+  if (!CAT) return m.innerHTML = '<div class="empty"><b>'+esc(BLD.name)+'</b>' +
+    BLD.address + '<br>请从上方选择要查看的信息类别（'+BLD.cats.length+' 类）</div>';
+
+  const kw = $("search").value.trim();
+  let body;
+  if (CAT.type==="kv")        body = kvHTML(CAT.items, kw);
+  else if (CAT.type==="table")body = tblHTML(CAT.headers, CAT.rows, kw);
+  else                        body = grpHTML(CAT, kw);
+
+  const n = CAT.type==="grouped"
+    ? CAT.groups.reduce((s,g)=>s+g.rows.length,0)
+    : (CAT.items||CAT.rows).length;
+  m.innerHTML =
+    `<div class="card"><h2>${esc(BLD.name)} · ${esc(CAT.label)}
+       <span class="cnt">${esc(CAT.hint||"")}　共 ${n} 条</span></h2>
+     ${CAT.hint?'<div class="hint">'+esc(CAT.hint)+'</div>':''}
+     <div class="pad legend">
+       <span><span class="tag t-owner">业主资料</span>上传的业主资料/守则/竣工图，可直接采信</span>
+       <span><span class="tag t-web">非官网来源，待核实</span>互联网非官网资料，不确定</span>
+       <span><span class="tag t-doubt">数据分歧/未载明</span>多源冲突或原始资料未载明</span>
+     </div>${body}</div>`;
+}
+
+$("city").addEventListener("change", ()=>{ fillBuildings(); $("cat").innerHTML=
+  '<option value="">请先选择楼宇</option>'; BLD=null; CAT=null; draw(); });
+$("bld").addEventListener("change", fillCats);
+$("cat").addEventListener("change", render);
+$("search").addEventListener("input", draw);
+
+/* ---------- 装修手册 ---------- */
+let MANUALS = null;
+
+function openManuals(){
+  $("mbox").hidden = false;
+  const side = $("mlist"), view = $("mview");
+  if (!MANUALS || !MANUALS.count){
+    side.innerHTML = '<div class="bad">档案中未挂接装修手册。<br>' +
+      '关键词：装修守则 / 装修手册 / 装修管理 / 装修须知</div>';
+    view.innerHTML = '';
+    return;
+  }
+  renderManuals();
+}
+function renderManuals(){
+  const d = MANUALS, side = $("mlist");
+  if (!d.count){
+    side.innerHTML = '<div class="bad">资料目录中未识别到装修手册文件。<br>' +
+      '关键词：装修守则 / 装修手册 / 装修管理 / 装修须知</div>';
+    $("mview").innerHTML = ''; return;
+  }
+  $("mtitle").textContent = "物业装修手册（" + d.count + " 个版本）";
+  side.innerHTML = d.manuals.map((m,i)=>{
+    const tag = m.isLatest
+      ? '<span class="tag t-owner" style="margin:4px 0 0">最新版本</span>' : '';
+    return `<div class="mitem${m.isLatest?' on':''}" data-i="${i}">
+      <div class="mv">${esc(m.version)} ${tag}</div>
+      <div class="mn">${esc(m.file)}</div>
+      <div class="mm">${m.date||''}${m.pages?' · '+m.pages+' 页':''}
+        · ${m.sizeKB} KB · 版本依据：${esc(m.versionFrom)}</div>
+      ${m.libUrl?`<a class="mlib" href="${esc(m.libUrl)}" target="_blank"
+        rel="noopener">在资料库中查看原件 →</a>`:''}
+    </div>`;
+  }).join('');
+  // 默认打开最新版（数组第 0 项已按版本倒序排好）
+  pickManual(0);
+}
+let PDF_URL = null;
+async function pickManual(i){
+  const m = MANUALS.manuals[i];
+  document.querySelectorAll('.mitem').forEach(el=>
+    el.classList.toggle('on', +el.dataset.i === i));
+  const view = $("mview");
+  if(!m.pdf){ view.innerHTML = ''; return; }
+  view.innerHTML = '<div class="bad">正在解密原文件…</div>';
+  try{
+    const r = await fetch(m.pdf, {cache:"force-cache"});
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    const pt = await crypto.subtle.decrypt(
+      {name:"AES-GCM", iv:b64dec(m.iv)}, KEY,
+      new Uint8Array(await r.arrayBuffer()));
+    if(PDF_URL) URL.revokeObjectURL(PDF_URL);
+    PDF_URL = URL.createObjectURL(new Blob([pt], {type:"application/pdf"}));
+    view.innerHTML =
+      `<iframe src="${PDF_URL}#toolbar=1&navpanes=0" title="${esc(m.file)}"></iframe>`;
+  }catch(e){
+    view.innerHTML = '<div class="bad">该版本原件未随站分发，请在资料库中查看：' +
+      (m.libUrl
+        ? `<a href="${esc(m.libUrl)}" target="_blank" rel="noopener">打开资料库</a>`
+        : '—') + '</div>';
+  }
+}
+$("mbtn").addEventListener("click", openManuals);
+$("mclose").addEventListener("click", ()=>{ $("mbox").hidden = true; });
+$("mbox").addEventListener("click", e=>{ if (e.target.id === "mbox") $("mbox").hidden = true; });
+$("mlist").addEventListener("click", e=>{
+  const it = e.target.closest('.mitem');
+  if (it) pickManual(+it.dataset.i);
+});
+document.addEventListener("keydown", e=>{
+  if (e.key === "Escape") $("mbox").hidden = true;
+});
+
+function loadData(){
+  if(!BUNDLE){
+    $("main").innerHTML = '<div class="empty"><b>数据未加载</b>' +
+      '请刷新页面并重新输入口令。</div>';
+    return;
+  }
+  DATA = BUNDLE;
+  MANUALS = BUNDLE.manuals || null;
+  fillCities(); draw();
+}
+</script>
+</body>
+</html>
