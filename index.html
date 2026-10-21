@@ -386,6 +386,41 @@ function grpHTML(cat, kw){
   return out.length ? out.join('') : '<div class="empty">没有匹配的内容</div>';
 }
 
+/* 资料来源：按 原始图 / 装修手册 / 物业手册 / 大厦手册 / 其他 分组，
+   每组下是「文档集」（一个图集/一份手册文件夹），显示名称/日期/份数/体积/格式/来源路径。 */
+function doclistHTML(items, kw){
+  const order = [
+    ["原始图", "原始图（图纸 / 报审 / 机电等）"],
+    ["装修手册", "装修手册 / 守则"],
+    ["物业手册", "物业手册 / 资料"],
+    ["大厦手册", "大厦手册 / 指南"],
+    ["其他", "其他资料"],
+  ];
+  const groups = {};
+  items.forEach(d=>{
+    if (hit([d.name, d.type, d.sub, d.date, d.exts], kw))
+      (groups[d.type] = groups[d.type] || []).push(d);
+  });
+  const out = [];
+  order.forEach(([t, label])=>{
+    const arr = groups[t];
+    if (!arr || !arr.length) return;
+    const files = arr.reduce((s,d)=>s+d.fileCount, 0);
+    out.push(`<div class="grp"><h3>${esc(label)}<span>${arr.length} 个文档集 · ${files} 份</span></h3>` +
+      '<div class="pad"><table><thead><tr>' +
+      '<th>文档集 / 子目录</th><th>日期</th><th>格式</th><th>份数</th><th>体积</th><th>来源路径</th>' +
+      '</tr></thead><tbody>' +
+      arr.map(d=>{
+        const sz = d.sizeKB>=1024 ? (d.sizeKB/1024).toFixed(1)+' MB' : d.sizeKB+' KB';
+        return `<tr><td>${hl(d.name,kw)}</td><td>${esc(d.date||'—')}</td>` +
+          `<td>${esc(d.exts||'—')}</td><td>${d.fileCount}</td><td>${esc(sz)}</td>` +
+          `<td style="color:#9AA1AC;word-break:break-all">${esc(d.src||'')}</td></tr>`;
+      }).join('') +
+      '</tbody></table></div></div>');
+  });
+  return out.length ? out.join('') : '<div class="empty">没有匹配的内容</div>';
+}
+
 function draw(){
   const m = $("main");
   if (!BLD) return m.innerHTML = '<div class="empty"><b>请先选择城市与楼宇</b>' +
@@ -397,6 +432,7 @@ function draw(){
   let body;
   if (CAT.type==="kv")        body = kvHTML(CAT.items, kw);
   else if (CAT.type==="table")body = tblHTML(CAT.headers, CAT.rows, kw);
+  else if (CAT.type==="doclist") body = doclistHTML(CAT.items, kw);
   else                        body = grpHTML(CAT, kw);
 
   const n = CAT.type==="grouped"
@@ -419,29 +455,30 @@ $("bld").addEventListener("change", fillCats);
 $("cat").addEventListener("change", render);
 $("search").addEventListener("input", draw);
 
-/* ---------- 装修手册 ---------- */
-let MANUALS = null;
+/* ---------- 装修手册（按当前楼宇隔离） ---------- */
+let MANUALS = null, CUR_LIST = [];
 
 function openManuals(){
   $("mbox").hidden = false;
-  const side = $("mlist"), view = $("mview");
-  if (!MANUALS || !MANUALS.count){
-    side.innerHTML = '<div class="bad">档案中未挂接装修手册。<br>' +
-      '关键词：装修守则 / 装修手册 / 装修管理 / 装修须知</div>';
-    view.innerHTML = '';
-    return;
+  if (!BLD){
+    $("mlist").innerHTML = '<div class="bad">请先选择楼宇，再查看该楼的装修手册。</div>';
+    $("mview").innerHTML = ''; return;
+  }
+  const list = (MANUALS && MANUALS.manuals || []).filter(m =>
+    m.building && (m.building === BLD.name || m.building === BLD.id));
+  CUR_LIST = list;
+  if (!list.length){
+    $("mlist").innerHTML =
+      `<div class="bad">「${esc(BLD.name)}」暂未随站分发装修手册原件。<br>` +
+      '可在该楼的「资料来源」目录查看手册线索（装修手册 / 物业手册 / 大厦手册）。</div>';
+    $("mview").innerHTML = ''; return;
   }
   renderManuals();
 }
 function renderManuals(){
-  const d = MANUALS, side = $("mlist");
-  if (!d.count){
-    side.innerHTML = '<div class="bad">资料目录中未识别到装修手册文件。<br>' +
-      '关键词：装修守则 / 装修手册 / 装修管理 / 装修须知</div>';
-    $("mview").innerHTML = ''; return;
-  }
-  $("mtitle").textContent = "物业装修手册（" + d.count + " 个版本）";
-  side.innerHTML = d.manuals.map((m,i)=>{
+  const side = $("mlist");
+  $("mtitle").textContent = "物业装修手册 · " + BLD.name + "（" + CUR_LIST.length + " 个版本）";
+  side.innerHTML = CUR_LIST.map((m,i)=>{
     const tag = m.isLatest
       ? '<span class="tag t-owner" style="margin:4px 0 0">最新版本</span>' : '';
     return `<div class="mitem${m.isLatest?' on':''}" data-i="${i}">
@@ -453,12 +490,12 @@ function renderManuals(){
         rel="noopener">在资料库中查看原件 →</a>`:''}
     </div>`;
   }).join('');
-  // 默认打开最新版（数组第 0 项已按版本倒序排好）
   pickManual(0);
 }
 let PDF_URL = null;
 async function pickManual(i){
-  const m = MANUALS.manuals[i];
+  const m = CUR_LIST[i];
+  if(!m) return;
   document.querySelectorAll('.mitem').forEach(el=>
     el.classList.toggle('on', +el.dataset.i === i));
   const view = $("mview");
