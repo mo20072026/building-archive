@@ -273,6 +273,15 @@ async function gateTry(){
   }
 }
 document.addEventListener("DOMContentLoaded", async ()=>{
+  /* 免密模式探测：站点里是明文 data.json 时直接进入，不弹口令门；
+     只有密文包（data.enc.json）时才要求口令。 */
+  try{
+    const r = await fetch("data.json", {cache:"no-store"});
+    if(r.ok){
+      BUNDLE = await r.json();
+      gatePaint(true); boot(); return;
+    }
+  }catch(e){}
   $("gbtn").addEventListener("click", gateTry);
   $("gpwd").addEventListener("keydown", e=>{ if(e.key==="Enter") gateTry(); });
   let p = null;
@@ -500,15 +509,18 @@ async function pickManual(i){
     el.classList.toggle('on', +el.dataset.i === i));
   const view = $("mview");
   if(!m.pdf){ view.innerHTML = ''; return; }
-  view.innerHTML = '<div class="bad">正在解密原文件…</div>';
+  view.innerHTML = m.iv ? '<div class="bad">正在解密原文件…</div>'
+                        : '<div class="bad">正在打开原文件…</div>';
   try{
     const r = await fetch(m.pdf, {cache:"force-cache"});
     if(!r.ok) throw new Error("HTTP " + r.status);
-    const pt = await crypto.subtle.decrypt(
-      {name:"AES-GCM", iv:b64dec(m.iv)}, KEY,
-      new Uint8Array(await r.arrayBuffer()));
+    let buf = new Uint8Array(await r.arrayBuffer());
+    if(m.iv){
+      buf = new Uint8Array(await crypto.subtle.decrypt(
+        {name:"AES-GCM", iv:b64dec(m.iv)}, KEY, buf));
+    }
     if(PDF_URL) URL.revokeObjectURL(PDF_URL);
-    PDF_URL = URL.createObjectURL(new Blob([pt], {type:"application/pdf"}));
+    PDF_URL = URL.createObjectURL(new Blob([buf], {type:"application/pdf"}));
     view.innerHTML =
       `<iframe src="${PDF_URL}#toolbar=1&navpanes=0" title="${esc(m.file)}"></iframe>`;
   }catch(e){
